@@ -1,0 +1,15 @@
+{
+  "name": "vised",
+  "version": "0.1.0",
+  "description": "A vim-based stream editor",
+  "main": "bin/vised",
+  "bin": {
+    "vised": "./bin/vised"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["vim"],
+  "author": "John Grib",
+  "license": "GPL-3.0"
+}

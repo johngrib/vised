@@ -1,0 +1,12 @@
+node_modules/
+.env
+
+.tmp
+.temp
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.bak
+
+tags
