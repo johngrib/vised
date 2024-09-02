@@ -1,0 +1,66 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const { spawn } = require('child_process');
+const os = require('os');
+const path = require('path');
+
+if (process.argv.length < 3) {
+    console.error(`Usage: ${process.argv[1]} <vim_command1> [<vim_command2> ...]`);
+    process.exit(1);
+}
+
+// Create a temp file
+const tmpDir = os.tmpdir();
+const tmpFile = path.join(tmpDir, `vised_${Date.now()}.tmp`);
+
+// Ensure that the temporary file is deleted when the program exits
+process.on('exit', () => {
+    try {
+        if (fs.existsSync(tmpFile)) {
+            fs.unlinkSync(tmpFile);
+        }
+    } catch (err) {
+        console.error(`Failed to delete temp file: ${err}`);
+    }
+});
+
+process.on('uncaughtException', (err) => {
+    console.error(`Uncaught exception: ${err}`);
+    process.exit(1);
+});
+
+let input = '';
+process.stdin.on('data', (chunk) => {
+    input += chunk;
+});
+
+process.stdin.on('end', () => {
+    try {
+        fs.writeFileSync(tmpFile, input);
+
+        // Generate vim cli command
+        const vimCommands = process.argv.slice(2).map(cmd => `+%normal ${cmd}`);
+        const vimArgs = ['-es', ...vimCommands, '+%print', '+:q!', tmpFile];
+
+        // Run vim
+        const vim = spawn('vim', vimArgs);
+
+        let output = '';
+        let error = '';
+
+        vim.stdout.on('data', (data) => { output += data; });
+        vim.stderr.on('data', (data) => { error += data; });
+
+        vim.on('close', (code) => {
+            process.stdout.write(output);
+            if (error) {
+                console.error(error);
+            }
+            process.exit(code);
+        });
+    } catch (err) {
+        console.error(`Error: ${err}`);
+        process.exit(1);
+    }
+});
