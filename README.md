@@ -1,2 +1,12 @@
 # vised
-Use vim commands in a sed-like manner for text stream processing
+
+A vim-based stream editor.
+
+## Installation
+
+```sh
+git clone git@github.com:johngrib/vised.git
+cd vised
+npm link
+```
+
